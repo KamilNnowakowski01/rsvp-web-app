@@ -1,12 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Step1 from "@/components/creator/Step1";
-import Step2 from "@/components/creator/Step2";
+import Step1and2 from "@/components/creator/Step1and2"; // Updated import
 import Step3 from "@/components/creator/Step3";
 import Step4 from "@/components/creator/Step4";
 import Step5 from "@/components/creator/Step5";
 import Step6 from "@/components/creator/Step6";
-import EventManager from "@/class/EventManager"; // Import EventManager
+import EventManager from "@/class/EventManager";
 
 // Create a singleton instance of EventManager
 const eventManager = new EventManager();
@@ -32,12 +31,12 @@ const EventCreator: React.FC = () => {
   });
 
   const handleNext = () => {
-    if (step < 5) setStep(step + 1);
+    if (step < 4) setStep(step + 1);
   };
 
   const handleBack = () => {
-    if (step === 3) setStep(1);
-    if (step > 3) setStep(step - 1);
+    // Back navigation is now handled in Step1and2; no action needed here for step 1
+    if (step > 1) setStep(step - 1);
   };
 
   const handleSubmit = () => {
@@ -63,7 +62,7 @@ const EventCreator: React.FC = () => {
     // Add the event to EventManager
     eventManager.addEvent(newEvent);
     console.log("Event added:", newEvent);
-    setStep(6);
+    setStep(5);
   };
 
   const handleConfirm = () => {
@@ -77,11 +76,16 @@ const EventCreator: React.FC = () => {
         <h2 className="text-4xl font-normal mt-2.5 mb-10">Creator</h2>
       </div>
       <div className="w-full max-w-md mx-auto">
-        {step === 1 && <Step1 formData={formData} setFormData={setFormData} onNext={handleNext} />}
-        {step === 2 && <Step2 formData={formData} setFormData={setFormData} onNext={handleNext} />}
-        {step === 3 && <Step3 formData={formData} setFormData={setFormData} onNext={handleNext} onBack={handleBack} />}
-        {step === 4 && <Step4 formData={formData} setFormData={setFormData} onNext={handleNext} onBack={handleBack} />}
-        {step === 5 && (
+        {step === 1 && (
+          <Step1and2
+            formData={formData}
+            setFormData={setFormData}
+            onNext={handleNext}
+          />
+        )}
+        {step === 2 && <Step3 formData={formData} setFormData={setFormData} onNext={handleNext} onBack={handleBack} />}
+        {step === 3 && <Step4 formData={formData} setFormData={setFormData} onNext={handleNext} onBack={handleBack} />}
+        {step === 4 && (
           <Step5
             formData={{
               startTime: formData.startTime,
@@ -99,7 +103,7 @@ const EventCreator: React.FC = () => {
             onBack={handleBack}
           />
         )}
-        {step === 6 && <Step6 onConfirm={handleConfirm} />}
+        {step === 5 && <Step6 onConfirm={handleConfirm} />}
       </div>
     </div>
   );

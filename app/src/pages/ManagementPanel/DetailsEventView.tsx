@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar as LucideCalendar, MapPin, Home, Hotel, Mail, ChevronDownIcon, Eye, RotateCcw } from "lucide-react";
+import { Calendar as LucideCalendar, MapPin, Home, Hotel, Mail, ChevronDownIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -30,6 +30,7 @@ interface EventContent {
 }
 
 type DisplayMode = "default" | "highlight" | "urgent" | "confirmed";
+type Step = "step1" | "step2" | "step3" | "step4" | "step5";
 
 export default function DetailsEventView() {
   const { idEvent } = useParams<{ idEvent: string }>();
@@ -50,6 +51,7 @@ export default function DetailsEventView() {
   const [isEditing, setIsEditing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [displayMode, setDisplayMode] = useState<DisplayMode>("default");
+  const [step, setStep] = useState<Step>("step1");
 
   useEffect(() => {
     if (!idEvent) {
@@ -157,8 +159,192 @@ export default function DetailsEventView() {
 
   const previewStyles = getPreviewStyles(displayMode);
 
+  const renderStepContent = () => {
+    switch (step) {
+      case "step1":
+        return (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label className="block text-sm font-medium text-gray-700">Czy wydarzenie jest ograniczone listą gości?</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  type="checkbox"
+                  name="setupQuestion1"
+                  checked={formData.setupQuestion1}
+                  onChange={(e) => handleQuestionChange("setupQuestion1", e.target.checked)}
+                  disabled={!isEditing}
+                />
+                <span>{formData.setupQuestion1 ? "Tak" : "Nie"}</span>
+              </div>
+            </div>
+          </div>
+        );
+      case "step2":
+        return (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label className="block text-sm font-medium text-gray-700">Czy wydarzenie jest płatne?</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  type="checkbox"
+                  name="setupQuestion2"
+                  checked={formData.setupQuestion2}
+                  onChange={(e) => handleQuestionChange("setupQuestion2", e.target.checked)}
+                  disabled={!isEditing}
+                />
+                <span>{formData.setupQuestion2 ? "Tak" : "Nie"}</span>
+              </div>
+            </div>
+          </div>
+        );
+      case "step3":
+        return (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="eventName">Nazwa wydarzenia</Label>
+              <Input
+                id="eventName"
+                name="eventName"
+                placeholder={texts.step3.placeholders.eventName}
+                value={formData.eventName}
+                onChange={handleFieldChange}
+                disabled={!isEditing}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="description">Opis</Label>
+              <Textarea
+                id="description"
+                name="description"
+                placeholder={texts.step3.placeholders.description}
+                value={formData.description}
+                onChange={handleFieldChange}
+                disabled={!isEditing}
+                rows={6}
+              />
+            </div>
+          </div>
+        );
+      case "step4":
+        return (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="locationName">Nazwa miejsca</Label>
+              <div className="flex items-center gap-2">
+                <Home className="w-5 h-5 text-gray-500" />
+                <Input
+                  id="locationName"
+                  name="locationName"
+                  placeholder={texts.step4.placeholders.locationName}
+                  value={formData.locationName}
+                  onChange={handleFieldChange}
+                  disabled={!isEditing}
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="city">Miasto</Label>
+              <div className="flex items-center gap-2">
+                <MapPin className="w-5 h-5 text-gray-500" />
+                <Input
+                  id="city"
+                  name="city"
+                  placeholder={texts.step4.placeholders.city}
+                  value={formData.city}
+                  onChange={handleFieldChange}
+                  disabled={!isEditing}
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="streetAddress">Adres</Label>
+              <div className="flex items-center gap-2">
+                <Hotel className="w-5 h-5 text-gray-500" />
+                <Input
+                  id="streetAddress"
+                  name="streetAddress"
+                  placeholder={texts.step4.placeholders.streetAddress}
+                  value={formData.streetAddress}
+                  onChange={handleFieldChange}
+                  disabled={!isEditing}
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="zipCode">Kod pocztowy</Label>
+              <div className="flex items-center gap-2">
+                <Mail className="w-5 h-5 text-gray-500" />
+                <Input
+                  id="zipCode"
+                  name="zipCode"
+                  placeholder={texts.step4.placeholders.zipCode}
+                  value={formData.zipCode}
+                  onChange={handleFieldChange}
+                  disabled={!isEditing}
+                />
+              </div>
+            </div>
+          </div>
+        );
+      case "step5":
+        return (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="time">Godzina</Label>
+              <div className="flex items-center gap-2">
+                <LucideCalendar className="w-5 h-5 text-gray-500" />
+                <Input
+                  id="time"
+                  name="time"
+                  type="time"
+                  value={formData.time}
+                  onChange={handleFieldChange}
+                  disabled={!isEditing}
+                  required
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="date">Data</Label>
+              <div className="flex items-center gap-2">
+                <Calendar className="w-5 h-5 text-gray-500" />
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn("w-full justify-between font-normal", !date && "text-muted-foreground")}
+                      disabled={!isEditing}
+                    >
+                      {date ? format(date, "yyyy-MM-dd") : "Wybierz datę"}
+                      <ChevronDownIcon className="h-4 w-4" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0">
+                    <Calendar
+                      mode="single"
+                      selected={date}
+                      onSelect={handleDateSelect}
+                      initialFocus
+                      disabled={!isEditing}
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+            </div>
+          </div>
+        );
+      default:
+        return (
+          <div className="text-center text-gray-500">
+            <p>Invalid step selected. Please choose a valid step.</p>
+          </div>
+        );
+    }
+  };
+
   return (
-    <section id="edit-event" className="max-w-7xl p-6 mx-auto">
+    <section id="edit-event" className="p-6 mx-auto w-full max-w-none">
       <h2 className="text-2xl font-bold mb-6">Event Details - ID: {idEvent}</h2>
       {error && (
         <Alert variant="destructive">
@@ -166,271 +352,46 @@ export default function DetailsEventView() {
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
-      <div className="grid gap-6 md:grid-cols-2">
-        {/* Editor Section */}
-        <div className="space-y-6">
-          {/* Step 1: Restrict Participant Additions */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Step 1: Restrict Participant Additions</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label className="block text-sm font-medium text-gray-700">Czy wydarzenie jest ograniczone listą gości?</Label>
-                <div className="flex items-center gap-2">
-                  <Input
-                    type="checkbox"
-                    name="setupQuestion1"
-                    checked={formData.setupQuestion1}
-                    onChange={(e) => handleQuestionChange("setupQuestion1", e.target.checked)}
-                    disabled={!isEditing}
-                  />
-                  <span>{formData.setupQuestion1 ? "Tak" : "Nie"}</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Step 2: Payment System Setup */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Step 2: Payment System Setup</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label className="block text-sm font-medium text-gray-700">Czy wydarzenie jest płatne?</Label>
-                <div className="flex items-center gap-2">
-                  <Input
-                    type="checkbox"
-                    name="setupQuestion2"
-                    checked={formData.setupQuestion2}
-                    onChange={(e) => handleQuestionChange("setupQuestion2", e.target.checked)}
-                    disabled={!isEditing}
-                  />
-                  <span>{formData.setupQuestion2 ? "Tak" : "Nie"}</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Step 3: Event Information */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Step 3: Event Information</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="eventName">Nazwa wydarzenia</Label>
-                <Input
-                  id="eventName"
-                  name="eventName"
-                  placeholder={texts.step3.placeholders.eventName}
-                  value={formData.eventName}
-                  onChange={handleFieldChange}
-                  disabled={!isEditing}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="description">Opis</Label>
-                <Textarea
-                  id="description"
-                  name="description"
-                  placeholder={texts.step3.placeholders.description}
-                  value={formData.description}
-                  onChange={handleFieldChange}
-                  disabled={!isEditing}
-                  rows={6}
-                />
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Step 4: Address Form */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Step 4: Address Form</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="locationName">Nazwa miejsca</Label>
-                <div className="flex items-center gap-2">
-                  <Home className="w-5 h-5 text-gray-500" />
-                  <Input
-                    id="locationName"
-                    name="locationName"
-                    placeholder={texts.step4.placeholders.locationName}
-                    value={formData.locationName}
-                    onChange={handleFieldChange}
-                    disabled={!isEditing}
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="city">Miasto</Label>
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-5 h-5 text-gray-500" />
-                  <Input
-                    id="city"
-                    name="city"
-                    placeholder={texts.step4.placeholders.city}
-                    value={formData.city}
-                    onChange={handleFieldChange}
-                    disabled={!isEditing}
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="streetAddress">Adres</Label>
-                <div className="flex items-center gap-2">
-                  <Hotel className="w-5 h-5 text-gray-500" />
-                  <Input
-                    id="streetAddress"
-                    name="streetAddress"
-                    placeholder={texts.step4.placeholders.streetAddress}
-                    value={formData.streetAddress}
-                    onChange={handleFieldChange}
-                    disabled={!isEditing}
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="zipCode">Kod pocztowy</Label>
-                <div className="flex items-center gap-2">
-                  <Mail className="w-5 h-5 text-gray-500" />
-                  <Input
-                    id="zipCode"
-                    name="zipCode"
-                    placeholder={texts.step4.placeholders.zipCode}
-                    value={formData.zipCode}
-                    onChange={handleFieldChange}
-                    disabled={!isEditing}
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Step 5: Event Date and Time */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Step 5: Event Date and Time</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="time">Godzina</Label>
-                <div className="flex items-center gap-2">
-                  <LucideCalendar className="w-5 h-5 text-gray-500" />
-                  <Input
-                    id="time"
-                    name="time"
-                    type="time"
-                    value={formData.time}
-                    onChange={handleFieldChange}
-                    disabled={!isEditing}
-                    required
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="date">Data</Label>
-                <div className="flex items-center gap-2">
-                  <Calendar className="w-5 h-5 text-gray-500" />
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className={cn("w-full justify-between font-normal", !date && "text-muted-foreground")}
-                        disabled={!isEditing}
-                      >
-                        {date ? format(date, "yyyy-MM-dd") : "Wybierz datę"}
-                        <ChevronDownIcon className="h-4 w-4" />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0">
-                      <Calendar
-                        mode="single"
-                        selected={date}
-                        onSelect={handleDateSelect}
-                        initialFocus
-                        disabled={!isEditing}
-                      />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <div className="flex justify-between items-center mt-6">
-            <div className="w-48">
-              <Label htmlFor="display-mode" className="sr-only">Display Mode</Label>
-              <Select value={displayMode} onValueChange={(value: DisplayMode) => setDisplayMode(value)}>
-                <SelectTrigger id="display-mode" className="w-full">
-                  <SelectValue placeholder="Select display mode" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="default">Default</SelectItem>
-                  <SelectItem value="highlight">Highlight</SelectItem>
-                  <SelectItem value="urgent">Urgent</SelectItem>
-                  <SelectItem value="confirmed">Confirmed</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+      <Card className="w-full">
+        <CardHeader>
+          <div className="flex justify-between items-center">
+            <CardTitle>Edit Event Details</CardTitle>
             <div className="flex items-center space-x-2">
-              <Button asChild variant="default" className="bg-black text-white hover:bg-gray-800">
-                <a href="#Preview">
-                  <Eye className="h-4 w-4 mr-2" />
-                  Event Preview
-                </a>
-              </Button>
-              <Button variant="secondary" onClick={handleReset}>
-                <span className="sr-only">Reset form</span>
-                <RotateCcw className="h-4 w-4" />
-              </Button>
-              {isEditing ? (
-                <>
-                  <Button variant="outline" onClick={handleCancel}>
-                    Cancel
-                  </Button>
-                  <Button onClick={handleSubmit}>Zapisz</Button>
-                </>
-              ) : (
-                <Button onClick={() => setIsEditing(true)}>Edytuj</Button>
-              )}
+              <div className="w-48">
+                <Label htmlFor="step-selector" className="sr-only">Select Step</Label>
+                <Select value={step} onValueChange={(value: Step) => setStep(value)}>
+                  <SelectTrigger id="step-selector" className="w-full">
+                    <SelectValue placeholder={step || "Select step"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="step1">Step 1: Restrict Participant Additions</SelectItem>
+                    <SelectItem value="step2">Step 2: Payment System Setup</SelectItem>
+                    <SelectItem value="step3">Step 3: Event Information</SelectItem>
+                    <SelectItem value="step4">Step 4: Address Form</SelectItem>
+                    <SelectItem value="step5">Step 5: Event Date and Time</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
-        </div>
-
-        {/* Preview Section */}
-        <Card className="w-[320px]">
-          <CardHeader>
-            <CardTitle>Event Preview</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className={`${previewStyles.bg} p-6 rounded-lg shadow-sm`} id="Preview">
-              <h1 className={`text-3xl font-bold ${previewStyles.text} mb-4`}>{formData.eventName || "Event Name"}</h1>
-              <p className={`text-sm ${previewStyles.text} mb-2`}>{formData.description || "Event Description"}</p>
-              <p className={`text-sm ${previewStyles.text} mb-2`}>
-                <MapPin className="inline-block w-4 h-4 mr-1" />
-                {formData.locationName || "Location"}, {formData.city || "City"}
-              </p>
-              <p className={`text-sm ${previewStyles.text} mb-2`}>
-                <Home className="inline-block w-4 h-4 mr-1" />
-                {formData.streetAddress || "Street Address"}, {formData.zipCode || "Zip Code"}
-              </p>
-              <p className={`text-sm ${previewStyles.text} mb-4`}>
-                <Calendar className="inline-block w-4 h-4 mr-1" />
-                {formData.date ? format(parse(formData.date, "yyyy-MM-dd", new Date()), "PPP") : "Date"} at {formData.time || "Time"}
-              </p>
-              <Button className={`${previewStyles.button} mb-2`}>Join Event</Button>
-              <p className={`text-sm ${previewStyles.text}`}>
-                {formData.setupQuestion1 ? "Guest List Required" : "Open to All"} | {formData.setupQuestion2 ? "Paid Event" : "Free Event"}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Separator className="my-4" />
+          {renderStepContent()}
+          <div className="flex justify-end space-x-2">
+            {isEditing ? (
+              <>
+                <Button variant="outline" onClick={handleCancel}>
+                  Cancel
+                </Button>
+                <Button onClick={handleSubmit}>Zapisz</Button>
+              </>
+            ) : (
+              <Button onClick={() => setIsEditing(true)}>Edytuj</Button>
+            )}
+          </div>
+        </CardContent>
+      </Card>
     </section>
   );
 }
